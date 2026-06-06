@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaia Residence · Direct Stays in Koh Phangan</title>
+  <meta name="description" content="Book Gaia Residence sea-view homes in Chaloklum, Koh Phangan directly. No booking fees, best-price guarantee, on-site team." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="logo" href="#/" aria-label="Gaia Residence home">
+        <span class="logo-mark">✦</span> GAIA
+        <span class="logo-sub">KOH PHANGAN</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#/search">Stays</a>
+        <a href="#/" data-scroll="why">Why direct</a>
+        <a href="#/" data-scroll="neighborhoods">Neighborhoods</a>
+        <a href="#/" data-scroll="footer">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <span class="nav-badge">Book direct · 0% fees</span>
+        <a class="btn btn-ghost" href="#/search">Find a stay</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="app"><!-- routed content --></main>
+
+  <footer class="footer" id="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="logo logo--light" href="#/"><span class="logo-mark">✦</span> GAIA <span class="logo-sub">KOH PHANGAN</span></a>
+        <p>Sea-view residences on a private hilltop in Chaloklum, Koh Phangan. Booked direct, cared for on-site.</p>
+        <p class="footer-note">Prototype for client review. Real Gaia Residence photos; nightly rates are placeholders.</p>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <h4>Explore</h4>
+          <a href="#/search">All stays</a>
+          <a href="#/">Neighborhoods</a>
+          <a href="#/">Long stays</a>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <a href="#/">About</a>
+          <a href="#/">Our hosts</a>
+          <a href="#/">Press</a>
+        </div>
+        <div>
+          <h4>Guests</h4>
+          <a href="#/">Help center</a>
+          <a href="#/">Cancellation</a>
+          <a href="#/">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Gaia Residence · Chaloklum, Koh Phangan</span>
+      <span>Best-price guarantee · No booking fees · Verified availability</span>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
