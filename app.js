@@ -333,7 +333,7 @@ function buildLocationMap() {
   if (!document.getElementById("loc-map")) return;
 
   mapInstance = L.map("loc-map", { scrollWheelZoom: false, zoomControl: true })
-    .setView([9.7548, 100.0090], 15);
+    .setView([9.7860, 100.0060], 15);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
     attribution: "© OpenStreetMap © CARTO", maxZoom: 19,
@@ -343,14 +343,15 @@ function buildLocationMap() {
     icon: L.divIcon({ className: "", html: `<div class="map-pin ${main ? "is-active" : "pin-poi"}">${label}</div>`, iconSize: null }),
   }).addTo(mapInstance);
 
-  pin(9.7539, 100.0092, "Gaia Residence", true);
-  pin(9.7560, 100.0082, "Chaloklum Beach");
-  pin(9.7566, 100.0104, "Chaloklum Pier");
-  pin(9.7551, 100.0108, "Village & cafés");
+  // Chaloklum Bay, north coast of Koh Phangan
+  pin(9.7843, 100.0056, "Gaia Residence", true);
+  pin(9.7873, 100.0042, "Chaloklum Beach");
+  pin(9.7881, 100.0083, "Chaloklum Pier");
+  pin(9.7861, 100.0064, "Village & cafés");
 
   mapInstance.fitBounds([
-    [9.7539, 100.0092], [9.7560, 100.0082], [9.7566, 100.0104], [9.7551, 100.0108],
-  ], { padding: [55, 55], maxZoom: 16 });
+    [9.7843, 100.0056], [9.7873, 100.0042], [9.7881, 100.0083], [9.7861, 100.0064],
+  ], { padding: [60, 60], maxZoom: 15 });
 }
 
 /* ============================================================
