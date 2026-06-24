@@ -37,7 +37,7 @@ const PROPERTIES = [
     blurb: "A sunlit one-bedroom with a private garden and the bay at your feet.",
     description:
       "Wake to 180° views over Chaloklum Bay in this calm, light-filled suite. Floor-to-ceiling glass opens to a private garden, two minutes from the sand. North-facing for a cool ocean breeze all day, with the café, spa and yoga shala just steps away.",
-    images: [gimg("living1.webp"), gimg("bed1.webp"), gimg("view1.webp"), gimg("dining.webp")],
+    images: [gimg("demo-sofa.jpg"), gimg("demo-bed.jpg"), gimg("demo-corner.jpg"), gimg("demo-plants.jpg")],
     booked: [["2026-06-20", "2026-06-26"], ["2026-07-10", "2026-07-15"]],
   },
   {
@@ -52,7 +52,7 @@ const PROPERTIES = [
     blurb: "Spacious two-bedroom with a panoramic terrace over the bay.",
     description:
       "103 m² of effortless island living. Two double bedrooms, a generous living space that flows onto a panoramic terrace, and uninterrupted ocean views protected forever by the national park beyond.",
-    images: [gimg("living2.webp"), gimg("bed2.webp"), gimg("view_room.webp"), gimg("sofa1.webp")],
+    images: [gimg("demo-greenery.jpg"), gimg("demo-sofatable.jpg"), gimg("demo-curtains.jpg"), gimg("demo-tv.jpg")],
     booked: [["2026-06-12", "2026-06-16"]],
   },
   {
@@ -67,7 +67,7 @@ const PROPERTIES = [
     blurb: "Ground-floor two-bedroom opening to a lush private garden.",
     description:
       "Surrounded by protected forest that can never be built upon. This ground-floor residence pairs a private garden with sweeping bay views, the best of both worlds for families and longer stays.",
-    images: [gimg("living3.webp"), gimg("bed1.webp"), gimg("ext2.webp"), gimg("dining.webp")],
+    images: [gimg("demo-corner.jpg"), gimg("demo-bed2.jpg"), gimg("demo-sofa2.jpg"), gimg("demo-plants.jpg")],
     booked: [["2026-08-01", "2026-08-12"]],
   },
   {
@@ -82,7 +82,7 @@ const PROPERTIES = [
     blurb: "Generous 206 m² with three ensuites and a wrap-around terrace.",
     description:
       "The flagship layout. 206 m² with a dedicated dining room, three ensuite bedrooms and a wrap-around panoramic terrace that follows the sun from sunrise over the jungle to sunset across the bay.",
-    images: [gimg("living1.webp"), gimg("bed2.webp"), gimg("view1.webp"), gimg("bath.webp")],
+    images: [gimg("duplex-living.jpg"), gimg("duplex-bed1.jpg"), gimg("duplex-dining.jpg"), gimg("cafe-1.jpg")],
     booked: [["2026-07-20", "2026-07-30"]],
   },
   {
@@ -97,7 +97,7 @@ const PROPERTIES = [
     blurb: "Three ensuites, soaring living space and 180° of ocean.",
     description:
       "High-end materials, spacious open-plan living and a wrap-around terrace built for long lunches and longer sunsets. Steps from the café, spa and the beach below.",
-    images: [gimg("living2.webp"), gimg("bed1.webp"), gimg("ext1.webp"), gimg("dining.webp")],
+    images: [gimg("duplex-dining.jpg"), gimg("duplex-bed2.jpg"), gimg("duplex-kitchen.jpg"), gimg("ext-2.jpg")],
     booked: [],
   },
   {
@@ -112,7 +112,7 @@ const PROPERTIES = [
     blurb: "A wide two-bedroom with one of the best terraces in the project.",
     description:
       "Designed around the view. An expansive terrace wraps the living space, framing the full sweep of Chaloklum Bay. Cool, north-facing and serene, with the village a short stroll downhill.",
-    images: [gimg("living3.webp"), gimg("bed2.webp"), gimg("view_room.webp"), gimg("bath.webp")],
+    images: [gimg("duplex-bedgreen.jpg"), gimg("duplex-living.jpg"), gimg("duplex-bath.jpg"), gimg("cafe-4.jpg")],
     booked: [["2026-06-13", "2026-06-15"], ["2026-09-01", "2026-09-05"]],
   },
   {
@@ -127,7 +127,7 @@ const PROPERTIES = [
     blurb: "Top-floor penthouse with 4.7 m ceilings and a private plunge pool.",
     description:
       "Soaring 4.7 m ceilings, a private plunge pool and the most expansive terrace in the development. The whole of Chaloklum Bay laid out below, with nothing to block the view, ever.",
-    images: [gimg("penthouse_bath.webp"), gimg("living1.webp"), gimg("view1.webp"), gimg("bed1.webp")],
+    images: [gimg("demo-curtains.jpg"), gimg("demo-greenery.jpg"), gimg("demo-bed.jpg"), gimg("duplex-living.jpg")],
     booked: [["2026-06-18", "2026-06-22"]],
   },
   {
@@ -142,7 +142,7 @@ const PROPERTIES = [
     blurb: "The grandest residence at Gaia, three ensuites, vast terrace, plunge pool.",
     description:
       "The crown of the hilltop. 206 m² of penthouse living with three ensuite bedrooms, a private plunge pool and a terrace that feels suspended over the sea. Sunset dinners you will never forget.",
-    images: [gimg("living2.webp"), gimg("penthouse_bath.webp"), gimg("ext_main.webp"), gimg("bed2.webp")],
+    images: [gimg("demo-sofatable.jpg"), gimg("demo-tv.jpg"), gimg("ext-3.jpg"), gimg("demo-sofa2.jpg")],
     booked: [],
   },
 ];

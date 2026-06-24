@@ -71,7 +71,7 @@ function cardHTML(p, booked = false) {
    ============================================================ */
 function renderHome() {
   const featured = PROPERTIES.slice(0, 6);
-  const gallery = ["img/view1.webp", "img/cafe.webp", "img/living2.webp", "img/penthouse_bath.webp", "img/ocean.webp", "img/ext1.webp"];
+  const gallery = ["img/demo-sofa.jpg", "img/cafe-2.jpg", "img/demo-bed.jpg", "img/demo-plants.jpg", "img/ext-2.jpg", "img/duplex-living.jpg"];
   const tens = [
     ["Sofia M.", "Stayed 5 nights", "The view at sunset is unreal, and the residence was spotless. Booking direct saved us a real chunk versus the app."],
     ["James & Ava", "Stayed 7 nights", "Two minutes to the beach, then café and yoga on-site. The team handled everything. Faultless."],
@@ -80,7 +80,7 @@ function renderHome() {
 
   app.innerHTML = `
   <section class="hero">
-    <div class="hero-bg">${imgTag("img/ext_main.webp", "Gaia Residence over Chaloklum Bay", "")}</div>
+    <div class="hero-bg">${imgTag("img/ext-main.jpg", "Gaia Residence over Chaloklum Bay", "")}</div>
     <div class="hero-content wrap">
       <div class="hero-eyebrow">Sea-view residences · Koh Phangan</div>
       <h1>Wake up over Chaloklum Bay. <em>Book direct, save more.</em></h1>
@@ -191,7 +191,7 @@ function renderHome() {
   </section>
 
   <section class="cta-band">
-    <div class="cta-bg">${imgTag("img/ocean.webp", "Chaloklum Bay at sunset")}</div>
+    <div class="cta-bg">${imgTag("img/ext-site.jpg", "Gaia Residence over Chaloklum Bay")}</div>
     <div class="wrap cta-in">
       <div class="section-eyebrow">Book direct</div>
       <h2>Your hilltop is waiting.</h2>
@@ -607,7 +607,7 @@ function pageBanner(eyebrow, title, sub, img) {
 
 function renderAbout() {
   app.innerHTML = pageBanner("The Project", "Where the jungle meets the sea",
-    "A private hilltop retreat in Chaloklum, Koh Phangan. Genuine seclusion, two minutes from the sand.", "img/ext_main.webp") + `
+    "A private hilltop retreat in Chaloklum, Koh Phangan. Genuine seclusion, two minutes from the sand.", "img/ext-1.jpg") + `
   <section class="page">
     <div class="wrap narrow-page">
       <p class="lede-quote">"Waking up to 180° views over Chaloklum Bay. Two minutes from your door, the beach, the cafés, the life."</p>
@@ -629,7 +629,7 @@ function renderAbout() {
         <p>Three collections sit across the hillside: the Ocean View Residences with private gardens, the generous Panorama Residences with wrap-around terraces, and the top-floor Penthouse Collection with soaring ceilings and plunge pools. Every home faces the bay.</p>
         <a class="btn btn-primary" href="#/search">Browse the residences</a>
       </div>
-      <div class="sf-media">${imgTag("img/view1.webp", "Sea view from Gaia")}</div>
+      <div class="sf-media">${imgTag("img/ext-2.jpg", "Gaia Residence with pool")}</div>
     </div>
   </section>`;
   window.scrollTo(0, 0);
@@ -637,7 +637,7 @@ function renderAbout() {
 
 function renderLocation() {
   app.innerHTML = pageBanner("Location", "Chaloklum, Koh Phangan",
-    "Where forested national-park mountains reach down to wide white-sand beaches.", "img/view1.webp") + `
+    "Where forested national-park mountains reach down to wide white-sand beaches.", "img/ext-site.jpg") + `
   <section class="page">
     <div class="wrap narrow-page">
       <p class="page-p">Gaia sits on a private mini-mountain at the heart of Chaloklum, a relaxed fishing village in the north of Koh Phangan. Walk to the beach, the cafés and the pier in minutes. Yet from your terrace: pure nature, pure silence, 180 degrees of ocean.</p>
@@ -666,13 +666,13 @@ function renderLocation() {
 
 function renderAmenities() {
   const rows = [
-    { t: "On-Site Café & Restaurant", img: "img/cafe.webp", d: "A boho-chic three-tier café with sea views, a pool terrace and an air-conditioned co-working space. Morning coffee by the water, sunset dinner in the open air." },
-    { t: "High-End Spa & Sauna", img: "img/bath.webp", d: "A full spa open to residents, with sauna and ice bath on-site. Wellness is part of everyday life at Gaia, not a once-a-trip treat." },
-    { t: "Yoga Shala", img: "img/cafe2.webp", d: "A dedicated movement space nestled within the grounds. Koh Phangan is one of the world's premier wellness destinations, brought home to your doorstep." },
-    { t: "Gym, Pool & Beyond", img: "img/view1.webp", d: "A fully-equipped gym, pools across the development and a family day-care centre. A complete daily rhythm without leaving the hilltop." },
+    { t: "On-Site Café & Restaurant", img: "img/cafe-1.jpg", d: "A boho-chic three-tier café with sea views, a pool terrace and an air-conditioned co-working space. Morning coffee by the water, sunset dinner in the open air." },
+    { t: "High-End Spa & Sauna", img: "img/demo-plants.jpg", d: "A full spa open to residents, with sauna and ice bath on-site. Wellness is part of everyday life at Gaia, not a once-a-trip treat." },
+    { t: "Yoga Shala", img: "img/cafe-3.jpg", d: "A dedicated movement space nestled within the grounds. Koh Phangan is one of the world's premier wellness destinations, brought home to your doorstep." },
+    { t: "Gym, Pool & Beyond", img: "img/ext-2.jpg", d: "A fully-equipped gym, pools across the development and a family day-care centre. A complete daily rhythm without leaving the hilltop." },
   ];
   app.innerHTML = pageBanner("Life at Gaia", "Everything in one place",
-    "Spa, yoga, gym, café and pool, steps from your door and the sea.", "img/cafe.webp") + `
+    "Spa, yoga, gym, café and pool, steps from your door and the sea.", "img/cafe-2.jpg") + `
   <section class="page">
     ${rows.map((r, i) => `
       <div class="wrap amenity-row ${i % 2 ? "rev" : ""}">
@@ -688,7 +688,7 @@ function renderAmenities() {
 
 function renderContact() {
   app.innerHTML = pageBanner("Contact", "Speak to our island team",
-    "Questions, special requests or a private transfer? Our team in Chaloklum is here to help.", "img/ext1.webp") + `
+    "Questions, special requests or a private transfer? Our team in Chaloklum is here to help.", "img/ext-4.jpg") + `
   <section class="page">
     <div class="wrap contact-page">
       <div class="cp-form">
@@ -737,7 +737,7 @@ function renderFAQ() {
     ["Are the residences serviced?", "Every residence is fully managed and cleaned, with the spa, yoga shala, gym and café all on-site."],
   ];
   app.innerHTML = pageBanner("FAQ", "Good to know",
-    "Everything you might want to ask before you book.", "img/living1.webp") + `
+    "Everything you might want to ask before you book.", "img/demo-sofa.jpg") + `
   <section class="page">
     <div class="wrap narrow-page">
       <div class="faq-list">
