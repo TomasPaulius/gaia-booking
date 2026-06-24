@@ -252,17 +252,20 @@ function renderSearch() {
       </div>
     </div>
 
-    <div class="wrap results-grid-wrap">
-      <div class="cards" id="avail-list">
-        ${available.length ? available.map(p => cardHTML(p)).join("") :
-          `<p style="color:var(--ink-soft)">No residences free for these dates. Try shifting your stay.</p>`}
+    <div class="results-layout">
+      <div class="results-list">
+        <div class="cards-2" id="avail-list">
+          ${available.length ? available.map(p => cardHTML(p)).join("") :
+            `<p style="color:var(--ink-soft)">No residences free for these dates. Try shifting your stay.</p>`}
+        </div>
+        ${booked.length ? `
+          <div class="unavailable-section">
+            <h3>Booked for your dates</h3>
+            <p>These ${booked.length} residence${booked.length>1?"s are":" is"} already reserved. Our live calendar hides them so you can't double-book.</p>
+            <div class="cards-2">${booked.map(p => cardHTML(p, true)).join("")}</div>
+          </div>` : ""}
       </div>
-      ${booked.length ? `
-        <div class="unavailable-section">
-          <h3>Booked for your dates</h3>
-          <p>These ${booked.length} residence${booked.length>1?"s are":" is"} already reserved. Our live calendar hides them so you can't double-book.</p>
-          <div class="cards">${booked.map(p => cardHTML(p, true)).join("")}</div>
-        </div>` : ""}
+      <aside class="results-aside"><div class="preview-panel" id="preview"></div></aside>
     </div>
   `;
 
@@ -275,11 +278,53 @@ function renderSearch() {
     renderSearch();
   });
 
-  // card → detail
-  app.querySelectorAll(".card:not(.is-booked)").forEach(c =>
-    c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`)));
+  // card hover → live preview panel, click → full residence
+  app.querySelectorAll(".results-list .card:not(.is-booked)").forEach(c => {
+    const p = available.find(x => x.id === c.dataset.id);
+    c.addEventListener("mouseenter", () => {
+      app.querySelectorAll(".card.is-active").forEach(o => o.classList.remove("is-active"));
+      c.classList.add("is-active");
+      renderPreview(p);
+    });
+    c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`));
+  });
+  if (available.length) {
+    renderPreview(available[0]);
+    const first = app.querySelector(".results-list .card");
+    if (first) first.classList.add("is-active");
+  }
 
   window.scrollTo(0, 0);
+}
+
+// Live preview + quick-book panel on the search page (replaces the map).
+function renderPreview(p) {
+  const panel = document.getElementById("preview");
+  if (!panel || !p) return;
+  const nn = nights(store.checkin, store.checkout) || 3;
+  const subtotal = p.price * nn;
+  const fee = Math.round(subtotal * AIRBNB_FEE_RATE);
+  const total = subtotal + p.cleaning;
+  panel.innerHTML = `
+    <div class="pp-media">${imgTag(p.images[0], p.name)}<span class="pp-tag">${p.neighborhood}</span></div>
+    <div class="pp-body">
+      <div class="pp-row"><h3>${p.name}</h3><span class="pp-rate">${stars(p.rating)}</span></div>
+      <div class="pp-meta">${p.guests} guests · ${p.beds} bed · ${p.baths} bath · ${p.sqm} m²</div>
+      <div class="pp-amen">${p.tags.slice(0, 4).map(t => `<span>${AMENITIES[t]}</span>`).join("")}</div>
+      <div class="pp-break">
+        <div class="bk-row"><span>${EUR(p.price)} × ${nn} night${nn>1?"s":""}</span><span>${EUR(subtotal)}</span></div>
+        <div class="bk-row"><span>Cleaning fee</span><span>${EUR(p.cleaning)}</span></div>
+        <div class="bk-row free"><span>Service fee <span class="bk-strike">${EUR(fee)}</span></span><b>$0</b></div>
+        <div class="bk-total"><span>Total</span><b>${EUR(total)}</b></div>
+      </div>
+      <div class="bk-save">✦ You save ${EUR(fee)} vs Airbnb</div>
+      <button class="btn btn-primary btn-block btn-lg" id="pp-reserve" style="margin-top:16px">Reserve direct</button>
+      <a class="pp-view" href="#/property/${p.id}">View residence & photos →</a>
+      <div class="bk-note">Free cancellation for 48h · no booking fees</div>
+    </div>
+  `;
+  const rb = document.getElementById("pp-reserve");
+  if (rb) rb.addEventListener("click", () => (location.hash = `#/book/${p.id}`));
 }
 
 // One shared development map for the Location page (all residences sit on the same hilltop).
