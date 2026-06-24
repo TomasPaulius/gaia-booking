@@ -236,20 +236,17 @@ function renderSearch() {
       </div>
     </div>
 
-    <div class="results-layout">
-      <div class="results-list">
-        <div class="cards-2" id="avail-list">
-          ${available.length ? available.map(p => cardHTML(p)).join("") :
-            `<p style="color:var(--ink-soft)">No residences free for these dates. Try shifting your stay.</p>`}
-        </div>
-        ${booked.length ? `
-          <div class="unavailable-section">
-            <h3>Booked for your dates</h3>
-            <p>These ${booked.length} residence${booked.length>1?"s are":" is"} already reserved. Our live calendar hides them so you can't double-book.</p>
-            <div class="cards-2">${booked.map(p => cardHTML(p, true)).join("")}</div>
-          </div>` : ""}
+    <div class="wrap results-grid-wrap">
+      <div class="cards" id="avail-list">
+        ${available.length ? available.map(p => cardHTML(p)).join("") :
+          `<p style="color:var(--ink-soft)">No residences free for these dates. Try shifting your stay.</p>`}
       </div>
-      <div class="results-map-wrap"><div id="map"></div></div>
+      ${booked.length ? `
+        <div class="unavailable-section">
+          <h3>Booked for your dates</h3>
+          <p>These ${booked.length} residence${booked.length>1?"s are":" is"} already reserved. Our live calendar hides them so you can't double-book.</p>
+          <div class="cards">${booked.map(p => cardHTML(p, true)).join("")}</div>
+        </div>` : ""}
     </div>
   `;
 
@@ -262,54 +259,37 @@ function renderSearch() {
     renderSearch();
   });
 
-  // card → detail + hover sync with map
-  app.querySelectorAll(".card:not(.is-booked)").forEach(c => {
-    c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`));
-    c.addEventListener("mouseenter", () => highlightPin(c.dataset.id, true));
-    c.addEventListener("mouseleave", () => highlightPin(c.dataset.id, false));
-  });
+  // card → detail
+  app.querySelectorAll(".card:not(.is-booked)").forEach(c =>
+    c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`)));
 
-  buildMap(available);
+  window.scrollTo(0, 0);
 }
 
-function buildMap(list) {
+// One shared development map for the Location page (all residences sit on the same hilltop).
+function buildLocationMap() {
   if (mapInstance) { mapInstance.remove(); mapInstance = null; }
-  markers = {};
-  if (!document.getElementById("map")) return;
+  if (!document.getElementById("loc-map")) return;
 
-  mapInstance = L.map("map", { scrollWheelZoom: false, zoomControl: true })
-    .setView([9.7539, 100.0092], 15);
+  mapInstance = L.map("loc-map", { scrollWheelZoom: false, zoomControl: true })
+    .setView([9.7548, 100.0090], 15);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    attribution: "© OpenStreetMap © CARTO",
-    maxZoom: 19,
+    attribution: "© OpenStreetMap © CARTO", maxZoom: 19,
   }).addTo(mapInstance);
 
-  const bounds = [];
-  list.forEach(p => {
-    const icon = L.divIcon({
-      className: "",
-      html: `<div class="map-pin" data-id="${p.id}">${EUR(p.price)}</div>`,
-      iconSize: null,
-    });
-    const m = L.marker([p.lat, p.lng], { icon }).addTo(mapInstance);
-    m.bindPopup(`<b>${p.name}</b><br>${p.neighborhood} · ${EUR(p.price)}/night<br>★ ${p.rating}`);
-    m.on("click", () => (location.hash = `#/property/${p.id}`));
-    m.on("mouseover", () => highlightCard(p.id, true));
-    m.on("mouseout", () => highlightCard(p.id, false));
-    markers[p.id] = m;
-    bounds.push([p.lat, p.lng]);
-  });
-  if (bounds.length) mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
-}
+  const pin = (lat, lng, label, main) => L.marker([lat, lng], {
+    icon: L.divIcon({ className: "", html: `<div class="map-pin ${main ? "is-active" : "pin-poi"}">${label}</div>`, iconSize: null }),
+  }).addTo(mapInstance);
 
-function highlightPin(id, on) {
-  const el = document.querySelector(`.map-pin[data-id="${id}"]`);
-  if (el) el.classList.toggle("is-active", on);
-}
-function highlightCard(id, on) {
-  const el = document.querySelector(`.card[data-id="${id}"]`);
-  if (el) el.classList.toggle("is-active", on);
+  pin(9.7539, 100.0092, "Gaia Residence", true);
+  pin(9.7560, 100.0082, "Chaloklum Beach");
+  pin(9.7566, 100.0104, "Chaloklum Pier");
+  pin(9.7551, 100.0108, "Village & cafés");
+
+  mapInstance.fitBounds([
+    [9.7539, 100.0092], [9.7560, 100.0082], [9.7566, 100.0104], [9.7551, 100.0108],
+  ], { padding: [55, 55], maxZoom: 16 });
 }
 
 /* ============================================================
@@ -360,9 +340,15 @@ function renderProperty(id) {
           </div>
 
           <div class="pd-section">
-            <h2>Where you'll be</h2>
-            <p style="margin-bottom:16px">${p.neighborhood} · Chaloklum, Koh Phangan. Two minutes downhill to the beach, cafés and pier.</p>
-            <div class="pd-map" id="pd-map"></div>
+            <h2>What's nearby</h2>
+            <p style="margin-bottom:18px">${p.neighborhood} · Chaloklum, Koh Phangan. Everything is moments downhill from the hilltop.</p>
+            <div class="nearby-grid">
+              <div class="nearby"><b>2 min</b><span>walk to Chaloklum Beach</span></div>
+              <div class="nearby"><b>3 min</b><span>to village cafés & restaurants</span></div>
+              <div class="nearby"><b>5 min</b><span>to Chaloklum Pier</span></div>
+              <div class="nearby"><b>20 min</b><span>drive to Thong Sala town</span></div>
+            </div>
+            <a class="link-more" href="#/location">Explore the location →</a>
           </div>
 
           <div class="pd-section" style="border-bottom:none">
@@ -437,16 +423,6 @@ function renderProperty(id) {
   document.getElementById("reserve-btn").addEventListener("click", () => {
     if (!document.getElementById("reserve-btn").disabled) location.hash = `#/book/${p.id}`;
   });
-
-  // mini map
-  setTimeout(() => {
-    if (!document.getElementById("pd-map")) return;
-    const m = L.map("pd-map", { scrollWheelZoom: false, zoomControl: true }).setView([p.lat, p.lng], 14);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: "© OSM © CARTO" }).addTo(m);
-    L.marker([p.lat, p.lng], {
-      icon: L.divIcon({ html: `<div class="map-pin is-active">${p.name}</div>`, iconSize: null }),
-    }).addTo(m);
-  }, 60);
 
   window.scrollTo(0, 0);
 }
@@ -554,19 +530,186 @@ function renderConfirmed() {
 }
 
 /* ============================================================
+   SUB-PAGES
+   ============================================================ */
+function pageBanner(eyebrow, title, sub, img) {
+  return `
+  <section class="page-hero">
+    <div class="page-hero-bg">${imgTag(img, title)}</div>
+    <div class="wrap page-hero-in">
+      <div class="hero-eyebrow">${eyebrow}</div>
+      <h1>${title}</h1>
+      ${sub ? `<p>${sub}</p>` : ""}
+    </div>
+  </section>`;
+}
+
+function renderAbout() {
+  app.innerHTML = pageBanner("The Project", "Where the jungle meets the sea",
+    "A private hilltop retreat in Chaloklum, Koh Phangan. Genuine seclusion, two minutes from the sand.", "img/ext_main.webp") + `
+  <section class="page">
+    <div class="wrap narrow-page">
+      <p class="lede-quote">"Waking up to 180° views over Chaloklum Bay. Two minutes from your door, the beach, the cafés, the life."</p>
+      <p class="page-p">Perched on its own private hilltop and wrapped in protected forest that can never be built upon, Gaia Residence is a rare thing: true seclusion, steps from the sea. North-facing for a cool ocean breeze all day, with high-end materials, spacious layouts and panoramic views from every residence.</p>
+      <p class="page-p">When you are away, a full turn-key team cares for your home and your guests. When you are here, the spa, yoga shala, gym and sea-view café are all part of daily life.</p>
+    </div>
+    <div class="wrap">
+      <div class="facts-grid">
+        <div class="fact"><b>180°</b><span>panoramic bay views</span></div>
+        <div class="fact"><b>2 min</b><span>walk to the beach</span></div>
+        <div class="fact"><b>North</b><span>facing, cool all day</span></div>
+        <div class="fact"><b>Forever</b><span>protected forest view</span></div>
+      </div>
+    </div>
+    <div class="wrap split-feature">
+      <div class="sf-text">
+        <div class="section-eyebrow">The setting</div>
+        <h2>A life elevated by nature</h2>
+        <p>Three collections sit across the hillside: the Ocean View Residences with private gardens, the generous Panorama Residences with wrap-around terraces, and the top-floor Penthouse Collection with soaring ceilings and plunge pools. Every home faces the bay.</p>
+        <a class="btn btn-primary" href="#/search">Browse the residences</a>
+      </div>
+      <div class="sf-media">${imgTag("img/view1.webp", "Sea view from Gaia")}</div>
+    </div>
+  </section>`;
+  window.scrollTo(0, 0);
+}
+
+function renderLocation() {
+  app.innerHTML = pageBanner("Location", "Chaloklum, Koh Phangan",
+    "Where forested national-park mountains reach down to wide white-sand beaches.", "img/view1.webp") + `
+  <section class="page">
+    <div class="wrap narrow-page">
+      <p class="page-p">Gaia sits on a private mini-mountain at the heart of Chaloklum, a relaxed fishing village in the north of Koh Phangan. Walk to the beach, the cafés and the pier in minutes. Yet from your terrace: pure nature, pure silence, 180 degrees of ocean.</p>
+    </div>
+    <div class="wrap">
+      <div class="nearby-grid big">
+        <div class="nearby"><b>2 min</b><span>walk to Chaloklum Beach</span></div>
+        <div class="nearby"><b>3 min</b><span>to village cafés & restaurants</span></div>
+        <div class="nearby"><b>5 min</b><span>to Chaloklum Pier</span></div>
+        <div class="nearby"><b>10 min</b><span>to Haad Khom / Coral Bay</span></div>
+        <div class="nearby"><b>20 min</b><span>drive to Thong Sala town</span></div>
+        <div class="nearby"><b>45 min</b><span>to the Haad Rin ferries</span></div>
+      </div>
+    </div>
+    <div class="wrap"><div class="loc-map-wrap"><div id="loc-map"></div></div></div>
+    <div class="wrap narrow-page">
+      <div class="section-eyebrow">Getting here</div>
+      <h2 style="margin-bottom:14px">How to reach Gaia</h2>
+      <p class="page-p">Fly into Koh Samui (USM) or Surat Thani (URT), then take the ferry to Thong Sala pier on Koh Phangan. From the pier it is a 20-minute drive north to Chaloklum. We are happy to arrange a private transfer to your residence.</p>
+      <a class="btn btn-primary" href="#/contact">Arrange a transfer</a>
+    </div>
+  </section>`;
+  setTimeout(buildLocationMap, 60);
+  window.scrollTo(0, 0);
+}
+
+function renderAmenities() {
+  const rows = [
+    { t: "On-Site Café & Restaurant", img: "img/cafe.webp", d: "A boho-chic three-tier café with sea views, a pool terrace and an air-conditioned co-working space. Morning coffee by the water, sunset dinner in the open air." },
+    { t: "High-End Spa & Sauna", img: "img/bath.webp", d: "A full spa open to residents, with sauna and ice bath on-site. Wellness is part of everyday life at Gaia, not a once-a-trip treat." },
+    { t: "Yoga Shala", img: "img/cafe2.webp", d: "A dedicated movement space nestled within the grounds. Koh Phangan is one of the world's premier wellness destinations, brought home to your doorstep." },
+    { t: "Gym, Pool & Beyond", img: "img/view1.webp", d: "A fully-equipped gym, pools across the development and a family day-care centre. A complete daily rhythm without leaving the hilltop." },
+  ];
+  app.innerHTML = pageBanner("Life at Gaia", "Everything in one place",
+    "Spa, yoga, gym, café and pool, steps from your door and the sea.", "img/cafe.webp") + `
+  <section class="page">
+    ${rows.map((r, i) => `
+      <div class="wrap amenity-row ${i % 2 ? "rev" : ""}">
+        <div class="ar-media">${imgTag(r.img, r.t)}</div>
+        <div class="ar-text"><h2>${r.t}</h2><p>${r.d}</p></div>
+      </div>`).join("")}
+    <div class="wrap" style="text-align:center;margin-top:24px">
+      <a class="btn btn-primary btn-lg" href="#/search">Find your residence</a>
+    </div>
+  </section>`;
+  window.scrollTo(0, 0);
+}
+
+function renderContact() {
+  app.innerHTML = pageBanner("Contact", "Speak to our island team",
+    "Questions, special requests or a private transfer? Our team in Chaloklum is here to help.", "img/ext1.webp") + `
+  <section class="page">
+    <div class="wrap contact-page">
+      <div class="cp-form">
+        <form id="contact-form">
+          <div class="field-row">
+            <div class="field"><label>Name</label><input id="cf-name" required placeholder="Your name"></div>
+            <div class="field"><label>Email</label><input id="cf-email" type="email" required placeholder="you@email.com"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Check in</label><input type="date" value="${store.checkin}" min="2026-06-06"></div>
+            <div class="field"><label>Check out</label><input type="date" value="${store.checkout}" min="2026-06-07"></div>
+          </div>
+          <div class="field"><label>Message</label><textarea rows="4" placeholder="Tell us about your stay"></textarea></div>
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Send enquiry</button>
+          <p class="form-success" id="cf-success" hidden>Thank you. Our team will reply within 24 hours.</p>
+        </form>
+      </div>
+      <aside class="cp-info">
+        <div class="section-eyebrow">Direct line</div>
+        <h2>Gaia Residence</h2>
+        <p class="cp-addr">Chaloklum, Koh Phangan, Surat Thani, Thailand</p>
+        <div class="cp-details">
+          <a href="mailto:hello@gaia-residence.com"><span>Email</span>hello@gaia-residence.com</a>
+          <a href="https://www.gaia-residence.com/" target="_blank" rel="noopener"><span>WhatsApp / Enquire</span>gaia-residence.com</a>
+        </div>
+        <p class="cp-note">Booking direct means no marketplace fees and a real person on the island looking after your stay.</p>
+      </aside>
+    </div>
+  </section>`;
+  document.getElementById("contact-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    e.target.querySelectorAll("input,textarea,button").forEach(el => el.disabled = true);
+    document.getElementById("cf-success").hidden = false;
+  });
+  window.scrollTo(0, 0);
+}
+
+function renderFAQ() {
+  const faqs = [
+    ["Is booking direct really cheaper than Airbnb?", "Yes. Marketplaces add a guest service fee of roughly 12-16% at checkout. Booking direct with Gaia removes that entirely, and we match any lower price you find for the same dates."],
+    ["How does payment work?", "You reserve online and pay securely. In the live site this connects to a payment provider; in this preview no card is charged."],
+    ["What are check-in and check-out times?", "Check-in is from 3pm and check-out is by 11am. Early check-in or late check-out can often be arranged with our on-site team."],
+    ["Is there a minimum stay?", "Most residences have a 2-night minimum, with better rates for weekly and monthly stays. Ask us about long-stay pricing."],
+    ["What is the cancellation policy?", "Free cancellation up to 48 hours after booking. After that, flexible and standard rates apply depending on the residence and season."],
+    ["Do you arrange airport transfers?", "Yes. Tell us your ferry or flight details and we will arrange a private transfer from Thong Sala pier to your residence."],
+    ["Are the residences serviced?", "Every residence is fully managed and cleaned, with the spa, yoga shala, gym and café all on-site."],
+  ];
+  app.innerHTML = pageBanner("FAQ", "Good to know",
+    "Everything you might want to ask before you book.", "img/living1.webp") + `
+  <section class="page">
+    <div class="wrap narrow-page">
+      <div class="faq-list">
+        ${faqs.map(([q, a]) => `<details class="faq-item"><summary>${q}</summary><p>${a}</p></details>`).join("")}
+      </div>
+      <div style="text-align:center;margin-top:42px">
+        <p class="page-p" style="margin-bottom:18px">Still have a question?</p>
+        <a class="btn btn-primary" href="#/contact">Contact our team</a>
+      </div>
+    </div>
+  </section>`;
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================
    ROUTER
    ============================================================ */
 function router() {
   const hash = location.hash || "#/";
   const parts = hash.replace(/^#\//, "").split("/");
 
-  if (mapInstance && parts[0] !== "search") { mapInstance.remove(); mapInstance = null; }
+  if (mapInstance && parts[0] !== "location") { mapInstance.remove(); mapInstance = null; }
 
-  if (parts[0] === "" ) return renderHome();
+  if (parts[0] === "") return renderHome();
   if (parts[0] === "search") return renderSearch();
   if (parts[0] === "property") return renderProperty(parts[1]);
   if (parts[0] === "book") return renderBook(parts[1]);
   if (parts[0] === "confirmed") return renderConfirmed();
+  if (parts[0] === "about") return renderAbout();
+  if (parts[0] === "location") return renderLocation();
+  if (parts[0] === "amenities") return renderAmenities();
+  if (parts[0] === "contact") return renderContact();
+  if (parts[0] === "faq") return renderFAQ();
   return renderHome();
 }
 
