@@ -71,21 +71,20 @@ function cardHTML(p, booked = false) {
    ============================================================ */
 function renderHome() {
   const featured = PROPERTIES.slice(0, 6);
-  const hoods = [
-    { n: "180° Sea Views", img: "img/view1.webp", t: "Every residence faces the bay" },
-    { n: "2′ to the Beach", img: "img/ext1.webp", t: "Sand, cafés and the pier" },
-    { n: "Café & Restaurant", img: "img/cafe.webp", t: "Boho-chic, sea-view dining" },
-    { n: "Spa & Sauna", img: "img/bath.webp", t: "Sauna and ice bath on-site" },
-    { n: "Yoga Shala", img: "img/cafe2.webp", t: "Movement nestled in the grounds" },
+  const gallery = ["img/view1.webp", "img/cafe.webp", "img/living2.webp", "img/penthouse_bath.webp", "img/ocean.webp", "img/ext1.webp"];
+  const tens = [
+    ["Sofia M.", "Stayed 5 nights", "The view at sunset is unreal, and the residence was spotless. Booking direct saved us a real chunk versus the app."],
+    ["James & Ava", "Stayed 7 nights", "Two minutes to the beach, then café and yoga on-site. The team handled everything. Faultless."],
+    ["Marco R.", "Stayed 4 nights", "The penthouse terrace alone is worth the trip. We are already planning our next stay."],
   ];
 
   app.innerHTML = `
   <section class="hero">
     <div class="hero-bg">${imgTag("img/ext_main.webp", "Gaia Residence over Chaloklum Bay", "")}</div>
     <div class="hero-content wrap">
-      <div class="hero-eyebrow">Sea-view residences · book direct · Koh Phangan</div>
-      <h1>Hilltop living over Chaloklum Bay. <em>Book direct, save more.</em></h1>
-      <p class="hero-sub">The same sea-view residences you'd find on Airbnb, booked straight with us. No service fees, a best-price guarantee, and our team on the island for you.</p>
+      <div class="hero-eyebrow">Sea-view residences · Koh Phangan</div>
+      <h1>Wake up over Chaloklum Bay. <em>Book direct, save more.</em></h1>
+      <div class="hero-proof"><span class="stars">★★★★★</span> <b>4.9</b> · 200+ happy guests <span class="scarce">· only a few residences left this season</span></div>
 
       <form class="searchbar" id="search-form">
         <div class="sb-field">
@@ -110,9 +109,10 @@ function renderHome() {
           </select>
         </div>
         <div class="sb-submit">
-          <button class="btn btn-primary" type="submit">Search stays</button>
+          <button class="btn btn-primary" type="submit">Check availability</button>
         </div>
       </form>
+      <p class="hero-reassure">Best price guaranteed · No booking fees · Free cancellation for 48h</p>
     </div>
   </section>
 
@@ -125,39 +125,12 @@ function renderHome() {
     </div>
   </div>
 
-  <section class="why" id="why">
-    <div class="wrap">
-      <div class="section-head">
-        <div class="section-eyebrow">Why book direct</div>
-        <h2>The same residences, a better deal for you.</h2>
-        <p>When you book Gaia direct instead of through a marketplace, you skip the middleman's cut. Everyone wins, except the fee.</p>
-      </div>
-      <div class="why-grid">
-        <div class="why-card"><div class="why-ico">％</div><h3>Zero service fees</h3><p>Marketplaces add 12-16% at checkout. We don't. The price you see is the price you pay.</p></div>
-        <div class="why-card"><div class="why-ico">✓</div><h3>Best-price guarantee</h3><p>See it cheaper on another site for the same dates? We'll match it and take off another 5%.</p></div>
-        <div class="why-card"><div class="why-ico">⚡</div><h3>Live availability</h3><p>Our calendar syncs across every platform in real time, so what you see is genuinely free.</p></div>
-        <div class="why-card"><div class="why-ico">♥</div><h3>A real host</h3><p>Direct line to the people who own and care for each home. Early check-in? Just ask.</p></div>
-      </div>
-
-      <div class="why-savings">
-        <div>
-          <h3>Booking direct saves a typical guest real money.</h3>
-          <p>On a 3-night stay at $320/night, a marketplace would add roughly $134 in service fees. With Gaia, that stays in your pocket.</p>
-        </div>
-        <div class="savings-figure">
-          <div class="big">~14%</div>
-          <div class="lbl">average saved vs Airbnb</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
+  <section class="home-residences">
     <div class="wrap">
       <div class="grid-head">
         <div class="section-head" style="margin-bottom:0">
-          <div class="section-eyebrow">Hand-picked</div>
-          <h2>Featured residences</h2>
+          <div class="section-eyebrow">The residences</div>
+          <h2>Find your sea-view home</h2>
         </div>
         <a class="btn btn-ghost" href="#/search">View all residences →</a>
       </div>
@@ -167,19 +140,64 @@ function renderHome() {
     </div>
   </section>
 
-  <section class="why" id="neighborhoods">
+  <section class="why gallery-sec">
     <div class="wrap">
-      <div class="section-head">
-        <div class="section-eyebrow">Life at Gaia</div>
-        <h2>Everything in one place, steps from the sea</h2>
+      <div class="section-head center">
+        <div class="section-eyebrow">Pure Koh Phangan</div>
+        <h2>This is what mornings look like</h2>
       </div>
-      <div class="hoods">
-        ${hoods.map(h => `
-          <div class="hood" data-hood="">
-            ${imgTag(h.img, h.n, "")}
-            <div class="hood-label"><h4>${h.n}</h4><span>${h.t}</span></div>
-          </div>`).join("")}
+      <div class="mosaic">
+        ${gallery.map((g, i) => `<div class="mo mo${i}">${imgTag(g, "Gaia Residence")}</div>`).join("")}
       </div>
+      <div style="text-align:center;margin-top:34px"><a class="btn btn-ghost" href="#/amenities">See life at Gaia →</a></div>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="wrap">
+      <div class="section-head center">
+        <div class="section-eyebrow">Why book direct</div>
+        <h2>Same residences. Better price. Zero fees.</h2>
+      </div>
+      <div class="why-grid why-grid-3">
+        <div class="why-card"><div class="why-ico">％</div><h3>No booking fees</h3><p>Marketplaces add 12-16% at checkout. We never do. The price you see is the price you pay.</p></div>
+        <div class="why-card"><div class="why-ico">✓</div><h3>Best-price guarantee</h3><p>Find it cheaper for the same dates? We match it and take off another 5%.</p></div>
+        <div class="why-card"><div class="why-ico">♡</div><h3>Free cancellation</h3><p>Plans change. Cancel free within 48 hours of booking, no questions asked.</p></div>
+      </div>
+
+      <div class="why-savings">
+        <div>
+          <h3>Booking direct keeps real money in your pocket.</h3>
+          <p>On a 3-night stay at $320/night, a marketplace adds roughly $134 in service fees. With Gaia, that is yours to spend on the island.</p>
+        </div>
+        <div class="savings-figure">
+          <div class="big">~14%</div>
+          <div class="lbl">average saved vs Airbnb</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="why">
+    <div class="wrap">
+      <div class="section-head center">
+        <div class="section-eyebrow">Loved by guests</div>
+        <h2>4.9 out of 5, and climbing</h2>
+      </div>
+      <div class="cards tcards">
+        ${tens.map(([nm, meta, txt]) => `<div class="tcard"><div class="tstars">★★★★★</div><p>"${txt}"</p><div class="tby"><b>${nm}</b><span>${meta}</span></div></div>`).join("")}
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="cta-bg">${imgTag("img/ocean.webp", "Chaloklum Bay at sunset")}</div>
+    <div class="wrap cta-in">
+      <div class="section-eyebrow">Book direct</div>
+      <h2>Your hilltop is waiting.</h2>
+      <p>The best price, zero fees and free cancellation. Straight with Gaia.</p>
+      <a class="btn btn-primary btn-lg" href="#/search">Check availability</a>
+      <div class="cta-reassure">★ 4.9 · 200+ guests · 2 minutes to the beach</div>
     </div>
   </section>
   `;
@@ -193,10 +211,8 @@ function renderHome() {
     store.guests = +document.getElementById("f-g").value;
     location.hash = "#/search";
   });
-  app.querySelectorAll(".card").forEach(c =>
+  app.querySelectorAll(".card[data-id]").forEach(c =>
     c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`)));
-  app.querySelectorAll(".hood").forEach(h =>
-    h.addEventListener("click", () => { store.location = "All residences"; location.hash = "#/search"; }));
 }
 
 /* ============================================================
@@ -698,6 +714,7 @@ function router() {
   const hash = location.hash || "#/";
   const parts = hash.replace(/^#\//, "").split("/");
 
+  document.body.dataset.route = parts[0] || "home";
   if (mapInstance && parts[0] !== "location") { mapInstance.remove(); mapInstance = null; }
 
   if (parts[0] === "") return renderHome();
