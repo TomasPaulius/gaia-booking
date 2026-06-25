@@ -46,7 +46,7 @@ function cardHTML(p, booked = false) {
   return `
     <article class="card ${booked ? "is-booked" : ""}" data-id="${p.id}">
       <div class="card-media">
-        ${imgTag(p.images[0], p.name, "", 800)}
+        <div class="card-swipe">${p.images.map(im => imgTag(im, p.name)).join("")}</div>
         <span class="card-tag">${p.neighborhood}</span>
         <span class="card-fav">♡</span>
       </div>
@@ -403,10 +403,11 @@ function renderProperty(id) {
         <a class="btn btn-ghost" href="#/search">← Back to results</a>
       </div>
 
-      <div class="pd-gallery">
+      <div class="pd-gallery" id="pd-gallery">
         ${imgTag(p.images[0], p.name, "g-main", 1400)}
         ${p.images.slice(1, 5).map(i => imgTag(i, p.name, "", 700)).join("")}
       </div>
+      <div class="pd-dots" id="pd-dots"></div>
 
       <div class="pd-body">
         <div>
@@ -510,6 +511,18 @@ function renderProperty(id) {
   document.getElementById("reserve-btn").addEventListener("click", () => {
     if (!document.getElementById("reserve-btn").disabled) location.hash = `#/book/${p.id}`;
   });
+
+  // mobile gallery: swipe dots
+  const gal = document.getElementById("pd-gallery");
+  const dots = document.getElementById("pd-dots");
+  if (gal && dots) {
+    const n = gal.querySelectorAll("img").length;
+    dots.innerHTML = Array.from({ length: n }, (_, i) => `<span${i === 0 ? ' class="on"' : ""}></span>`).join("");
+    gal.addEventListener("scroll", () => {
+      const i = Math.round(gal.scrollLeft / gal.clientWidth);
+      [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i));
+    });
+  }
 
   window.scrollTo(0, 0);
 }
