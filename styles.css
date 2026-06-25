@@ -87,6 +87,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height
   box-shadow: 0 4px 14px rgba(47, 68, 52, 0.22);
 }
 .nav-badge b { color: var(--gold); font-weight: 800; }
+.nav-burger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; }
+.nav-burger span { display: block; width: 21px; height: 2px; background: var(--ink); margin: 0 auto; border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }
+.nav.open .nav-burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav.open .nav-burger span:nth-child(2) { opacity: 0; }
+.nav.open .nav-burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -309,15 +314,28 @@ section { padding: 84px 0; }
   .wrap { padding: 0 20px; }
   section { padding: 56px 0; }
 
-  /* nav: collapse to logo + compact "0% fees" badge + one action */
-  .nav-links { display: none; }
+  /* nav: logo + compact "0% fees" badge + hamburger menu */
   .nav-inner { padding: 13px 16px; gap: 9px; }
   .nav-badge { font-size: 11px; padding: 7px 11px; box-shadow: none; }
   .nav-badge .nb-full { display: none; }
   .nav-actions { gap: 9px; }
+  .nav-actions .btn { display: none; }  /* covered by the menu + sticky CTA */
   .logo { font-size: 19px; flex-shrink: 0; }
   .logo-sub { display: none; }
-  .nav-actions .btn { padding: 10px 15px; font-size: 13.5px; }
+  .nav-burger { display: flex; }
+
+  /* slide-down menu panel */
+  .nav-links {
+    display: flex; flex-direction: column; gap: 0;
+    position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--cream); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-md); padding: 4px 20px 14px;
+    transform: translateY(-12px); opacity: 0; pointer-events: none;
+    transition: transform .26s ease, opacity .26s ease;
+  }
+  .nav.open .nav-links { transform: none; opacity: 1; pointer-events: auto; }
+  .nav-links a { font-family: var(--font-display); font-size: 19px; font-weight: 500; color: var(--ink); padding: 15px 2px; border-bottom: 1px solid var(--line); }
+  .nav-links a:last-child { border-bottom: none; }
 
   /* hero */
   .hero { min-height: 78vh; padding-bottom: 40px; }

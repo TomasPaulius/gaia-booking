@@ -804,3 +804,19 @@ function router() {
 window.addEventListener("hashchange", router);
 window.addEventListener("DOMContentLoaded", router);
 router();
+
+// mobile hamburger menu
+(function () {
+  const nav = document.getElementById("nav");
+  const burger = document.getElementById("nav-burger");
+  if (!nav || !burger) return;
+  const close = () => { nav.classList.remove("open"); burger.setAttribute("aria-expanded", "false"); };
+  burger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = nav.classList.toggle("open");
+    burger.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  nav.querySelectorAll(".nav-links a").forEach(a => a.addEventListener("click", close));
+  window.addEventListener("hashchange", close);
+  document.addEventListener("click", (e) => { if (nav.classList.contains("open") && !nav.contains(e.target)) close(); });
+})();
