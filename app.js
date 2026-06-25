@@ -112,7 +112,7 @@ function renderHome() {
           <button class="btn btn-primary" type="submit">Check availability</button>
         </div>
       </form>
-      <p class="hero-reassure">Best price guaranteed · No booking fees · Free cancellation for 48h</p>
+      <p class="hero-reassure">Best price guaranteed · No booking fees · On-island team for you</p>
     </div>
   </section>
 
@@ -162,7 +162,7 @@ function renderHome() {
       <div class="why-grid why-grid-3">
         <div class="why-card"><div class="why-ico">％</div><h3>No booking fees</h3><p>Marketplaces add 12-16% at checkout. We never do. The price you see is the price you pay.</p></div>
         <div class="why-card"><div class="why-ico">✓</div><h3>Best-price guarantee</h3><p>Find it cheaper for the same dates? We match it and take off another 5%.</p></div>
-        <div class="why-card"><div class="why-ico">♡</div><h3>Free cancellation</h3><p>Plans change. Cancel free within 48 hours of booking, no questions asked.</p></div>
+        <div class="why-card"><div class="why-ico">✦</div><h3>Cared for on-site</h3><p>A real team on Koh Phangan handles check-in, cleaning and any request, before and during your stay.</p></div>
       </div>
 
       <div class="why-savings">
@@ -195,7 +195,7 @@ function renderHome() {
     <div class="wrap cta-in">
       <div class="section-eyebrow">Book direct</div>
       <h2>Your hilltop is waiting.</h2>
-      <p>The best price, zero fees and free cancellation. Straight with Gaia.</p>
+      <p>The best price, zero fees and a real team on the island. Straight with Gaia.</p>
       <a class="btn btn-primary btn-lg" href="#/search">Check availability</a>
       <div class="cta-reassure">★ 4.9 · 200+ guests · 2 minutes to the beach</div>
     </div>
@@ -278,16 +278,30 @@ function renderSearch() {
     renderSearch();
   });
 
-  // card hover → live preview panel, click → full residence
+  // card hover → live preview, click → full residence.
+  // hover-intent delay + panel lock so the preview doesn't flip while the cursor
+  // crosses other cards on its way over to the panel.
+  let hoverTimer = null, panelLocked = false;
+  const showPreview = (c, p) => {
+    app.querySelectorAll(".card.is-active").forEach(o => o.classList.remove("is-active"));
+    c.classList.add("is-active");
+    renderPreview(p);
+  };
   app.querySelectorAll(".results-list .card:not(.is-booked)").forEach(c => {
     const p = available.find(x => x.id === c.dataset.id);
     c.addEventListener("mouseenter", () => {
-      app.querySelectorAll(".card.is-active").forEach(o => o.classList.remove("is-active"));
-      c.classList.add("is-active");
-      renderPreview(p);
+      if (panelLocked) return;
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => showPreview(c, p), 130);
     });
+    c.addEventListener("mouseleave", () => clearTimeout(hoverTimer));
     c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`));
   });
+  const aside = app.querySelector(".results-aside");
+  if (aside) {
+    aside.addEventListener("mouseenter", () => { panelLocked = true; clearTimeout(hoverTimer); });
+    aside.addEventListener("mouseleave", () => { panelLocked = false; });
+  }
   if (available.length) {
     renderPreview(available[0]);
     const first = app.querySelector(".results-list .card");
@@ -306,7 +320,13 @@ function renderPreview(p) {
   const fee = Math.round(subtotal * AIRBNB_FEE_RATE);
   const total = subtotal + p.cleaning;
   panel.innerHTML = `
-    <div class="pp-media">${imgTag(p.images[0], p.name)}<span class="pp-tag">${p.neighborhood}</span></div>
+    <div class="pp-media">
+      <img id="pp-main" loading="lazy" src="${p.images[0]}" alt="${p.name}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/gaia/900/700'" />
+      <span class="pp-tag">${p.neighborhood}</span>
+    </div>
+    <div class="pp-thumbs">
+      ${p.images.map((im, i) => `<button class="pp-thumb${i === 0 ? " active" : ""}" data-src="${im}" aria-label="Photo ${i + 1}"><img src="${im}" alt="" loading="lazy" /></button>`).join("")}
+    </div>
     <div class="pp-body">
       <div class="pp-row"><h3>${p.name}</h3><span class="pp-rate">${stars(p.rating)}</span></div>
       <div class="pp-meta">${p.guests} guests · ${p.beds} bed · ${p.baths} bath · ${p.sqm} m²</div>
@@ -319,12 +339,17 @@ function renderPreview(p) {
       </div>
       <div class="bk-save">✦ You save ${EUR(fee)} vs Airbnb</div>
       <button class="btn btn-primary btn-block btn-lg" id="pp-reserve" style="margin-top:16px">Reserve direct</button>
-      <a class="pp-view" href="#/property/${p.id}">View residence & photos →</a>
-      <div class="bk-note">Free cancellation for 48h · no booking fees</div>
+      <a class="pp-view" href="#/property/${p.id}">View residence & all photos →</a>
+      <div class="bk-note">On-island team · no booking fees</div>
     </div>
   `;
   const rb = document.getElementById("pp-reserve");
   if (rb) rb.addEventListener("click", () => (location.hash = `#/book/${p.id}`));
+  // quick photo review: hover or click a thumbnail to swap the main image
+  const main = panel.querySelector("#pp-main");
+  const thumbs = panel.querySelectorAll(".pp-thumb");
+  const swap = (t) => { if (main) main.src = t.dataset.src; thumbs.forEach(x => x.classList.toggle("active", x === t)); };
+  thumbs.forEach(t => { t.addEventListener("mouseenter", () => swap(t)); t.addEventListener("click", () => swap(t)); });
 }
 
 // One shared development map for the Location page (all residences sit on the same hilltop).
@@ -444,7 +469,7 @@ function renderProperty(id) {
             <button class="btn btn-primary btn-block btn-lg" id="reserve-btn" style="margin-top:18px" ${avail?"":"disabled style=opacity:.5"}>
               Reserve direct
             </button>
-            <div class="bk-note">You won't be charged yet · free cancellation for 48h</div>
+            <div class="bk-note">You won't be charged yet · on-island team on call</div>
           </div>
         </aside>
       </div>
@@ -733,7 +758,7 @@ function renderFAQ() {
     ["How does payment work?", "You reserve online and pay securely. In the live site this connects to a payment provider; in this preview no card is charged."],
     ["What are check-in and check-out times?", "Check-in is from 3pm and check-out is by 11am. Early check-in or late check-out can often be arranged with our on-site team."],
     ["Is there a minimum stay?", "Most residences have a 2-night minimum, with better rates for weekly and monthly stays. Ask us about long-stay pricing."],
-    ["What is the cancellation policy?", "Free cancellation up to 48 hours after booking. After that, flexible and standard rates apply depending on the residence and season."],
+    ["What is the cancellation policy?", "Cancellation terms depend on the residence and the season. We keep them simple and clear, and confirm everything in writing before you book."],
     ["Do you arrange airport transfers?", "Yes. Tell us your ferry or flight details and we will arrange a private transfer from Thong Sala pier to your residence."],
     ["Are the residences serviced?", "Every residence is fully managed and cleaned, with the spa, yoga shala, gym and café all on-site."],
   ];
