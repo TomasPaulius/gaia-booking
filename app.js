@@ -42,11 +42,13 @@ function stars(r) {
 }
 
 // ---- card markup (shared) ----
-function cardHTML(p, booked = false) {
+// gallery=true adds hover arrows (used on the homepage, where there is no side preview).
+function cardHTML(p, booked = false, gallery = false) {
   return `
-    <article class="card ${booked ? "is-booked" : ""}" data-id="${p.id}">
+    <article class="card ${gallery ? "card-gal" : ""} ${booked ? "is-booked" : ""}" data-id="${p.id}">
       <div class="card-media">
-        ${imgTag(p.images[0], p.name, "g-photo")}
+        <div class="gtrack">${p.images.map(im => imgTag(im, p.name)).join("")}</div>
+        ${gallery && p.images.length > 1 ? `<button class="gnav gprev" type="button" aria-label="Previous photo">‹</button><button class="gnav gnext" type="button" aria-label="Next photo">›</button>` : ""}
         ${p.images.length > 1 ? `<div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
         <span class="card-tag">${p.neighborhood}</span>
         <span class="card-fav">♡</span>
@@ -95,14 +97,44 @@ function initGallery(root, images) {
   }, { passive: true });
 }
 
-// Cards: dots + swipe (no arrows). Hover shows the side preview where arrows live.
+// Real scroll-track gallery: finger-swipe scrolls it on mobile; ‹/› arrows scroll it
+// on desktop (where present). Dots + counter follow the scroll position. Images load
+// just-in-time. Used by the cards and the mobile residence carousel.
+function initTrackGallery(root) {
+  const track = root.querySelector(".gtrack");
+  if (!track) return;
+  const imgs = [...track.querySelectorAll("img")];
+  if (imgs.length < 2) return;
+  const dots = [...root.querySelectorAll(".gdots span")];
+  const count = root.querySelector(".gcount");
+  const load = (k) => [k, k + 1].forEach(j => { if (imgs[j] && imgs[j].loading === "lazy") imgs[j].loading = "eager"; });
+  load(0);
+  const update = () => {
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    dots.forEach((d, j) => d.classList.toggle("on", j === i));
+    if (count) count.textContent = (i + 1) + " / " + imgs.length;
+    load(i);
+  };
+  track.addEventListener("scroll", update, { passive: true });
+  const arrow = (dir, e) => {
+    if (e) e.stopPropagation();
+    const i = Math.round(track.scrollLeft / track.clientWidth);
+    const ni = (i + dir + imgs.length) % imgs.length;
+    load(ni);
+    track.scrollLeft = ni * track.clientWidth;
+    update();
+  };
+  const prev = root.querySelector(".gprev"), next = root.querySelector(".gnext");
+  prev && prev.addEventListener("click", e => arrow(-1, e));
+  next && next.addEventListener("click", e => arrow(1, e));
+}
+
+// Wire every card's photo gallery.
 function wireCardGalleries(scope) {
   (scope || document).querySelectorAll(".card[data-id]").forEach(card => {
     if (card.dataset.gwired) return;
-    const p = PROPERTIES.find(x => x.id === card.dataset.id);
-    if (!p) return;
     card.dataset.gwired = "1";
-    initGallery(card, p.images);
+    initTrackGallery(card);
   });
 }
 
@@ -175,7 +207,7 @@ function renderHome() {
         <a class="btn btn-ghost" href="#/search">View all residences →</a>
       </div>
       <div class="cards">
-        ${featured.map(p => cardHTML(p)).join("")}
+        ${featured.map(p => cardHTML(p, false, true)).join("")}
       </div>
     </div>
   </section>
@@ -444,8 +476,8 @@ function renderProperty(id) {
         ${p.images.slice(1, 5).map(i => imgTag(i, p.name, "")).join("")}
       </div>
       <div class="pd-carousel" id="pd-carousel">
-        ${imgTag(p.images[0], p.name, "g-photo")}
-        ${p.images.length > 1 ? `<div class="gcount" id="pd-count">1 / ${p.images.length}</div><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
+        <div class="gtrack">${p.images.map(im => imgTag(im, p.name)).join("")}</div>
+        ${p.images.length > 1 ? `<div class="gcount">1 / ${p.images.length}</div><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
       </div>
 
       <div class="pd-body">
@@ -551,8 +583,8 @@ function renderProperty(id) {
     if (!document.getElementById("reserve-btn").disabled) location.hash = `#/book/${p.id}`;
   });
 
-  // mobile photo gallery: swipe + dots + counter
-  initGallery(document.getElementById("pd-carousel"), p.images);
+  // mobile photo gallery: real swipe-scroll + dots + counter
+  initTrackGallery(document.getElementById("pd-carousel"));
 
   window.scrollTo(0, 0);
 }
