@@ -46,7 +46,8 @@ function cardHTML(p, booked = false) {
   return `
     <article class="card ${booked ? "is-booked" : ""}" data-id="${p.id}">
       <div class="card-media">
-        <div class="card-swipe">${p.images.map(im => imgTag(im, p.name)).join("")}</div>
+        ${imgTag(p.images[0], p.name, "g-photo")}
+        ${p.images.length > 1 ? `<button class="gnav gprev" type="button" aria-label="Previous photo">‹</button><button class="gnav gnext" type="button" aria-label="Next photo">›</button><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
         <span class="card-tag">${p.neighborhood}</span>
         <span class="card-fav">♡</span>
       </div>
@@ -64,6 +65,28 @@ function cardHTML(p, booked = false) {
         </div>
       </div>
     </article>`;
+}
+
+// Wire the ‹ › arrows + dots on every card image so photos flip on click (works on
+// desktop and mobile). Arrow clicks don't bubble, so they never open the residence.
+function wireCardGalleries(scope) {
+  (scope || document).querySelectorAll(".card[data-id]").forEach(card => {
+    if (card.dataset.gwired) return;
+    const p = PROPERTIES.find(x => x.id === card.dataset.id);
+    if (!p || p.images.length < 2) return;
+    card.dataset.gwired = "1";
+    const photo = card.querySelector(".g-photo");
+    const dots = [...card.querySelectorAll(".gdots span")];
+    let i = 0;
+    const go = (d, e) => {
+      e.stopPropagation();
+      i = (i + d + p.images.length) % p.images.length;
+      photo.src = p.images[i];
+      dots.forEach((dt, j) => dt.classList.toggle("on", j === i));
+    };
+    card.querySelector(".gprev").addEventListener("click", e => go(-1, e));
+    card.querySelector(".gnext").addEventListener("click", e => go(1, e));
+  });
 }
 
 /* ============================================================
@@ -213,6 +236,7 @@ function renderHome() {
   });
   app.querySelectorAll(".card[data-id]").forEach(c =>
     c.addEventListener("click", () => (location.hash = `#/property/${c.dataset.id}`)));
+  wireCardGalleries(app);
 }
 
 /* ============================================================
@@ -307,6 +331,7 @@ function renderSearch() {
     const first = app.querySelector(".results-list .card");
     if (first) first.classList.add("is-active");
   }
+  wireCardGalleries(app);
 
   window.scrollTo(0, 0);
 }
@@ -404,10 +429,13 @@ function renderProperty(id) {
       </div>
 
       <div class="pd-gallery" id="pd-gallery">
-        ${imgTag(p.images[0], p.name, "g-main", 1400)}
-        ${p.images.slice(1, 5).map(i => imgTag(i, p.name, "", 700)).join("")}
+        ${imgTag(p.images[0], p.name, "g-main")}
+        ${p.images.slice(1, 5).map(i => imgTag(i, p.name, "")).join("")}
       </div>
-      <div class="pd-dots" id="pd-dots"></div>
+      <div class="pd-carousel" id="pd-carousel">
+        ${imgTag(p.images[0], p.name, "pc-photo")}
+        ${p.images.length > 1 ? `<button class="gnav gprev" type="button" aria-label="Previous photo">‹</button><button class="gnav gnext" type="button" aria-label="Next photo">›</button><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
+      </div>
 
       <div class="pd-body">
         <div>
@@ -512,16 +540,19 @@ function renderProperty(id) {
     if (!document.getElementById("reserve-btn").disabled) location.hash = `#/book/${p.id}`;
   });
 
-  // mobile gallery: swipe dots
-  const gal = document.getElementById("pd-gallery");
-  const dots = document.getElementById("pd-dots");
-  if (gal && dots) {
-    const n = gal.querySelectorAll("img").length;
-    dots.innerHTML = Array.from({ length: n }, (_, i) => `<span${i === 0 ? ' class="on"' : ""}></span>`).join("");
-    gal.addEventListener("scroll", () => {
-      const i = Math.round(gal.scrollLeft / gal.clientWidth);
-      [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i));
-    });
+  // mobile photo carousel: arrows + dots
+  const pc = document.getElementById("pd-carousel");
+  if (pc && p.images.length > 1) {
+    const photo = pc.querySelector(".pc-photo");
+    const dots = [...pc.querySelectorAll(".gdots span")];
+    let i = 0;
+    const go = (d) => {
+      i = (i + d + p.images.length) % p.images.length;
+      photo.src = p.images[i];
+      dots.forEach((dt, j) => dt.classList.toggle("on", j === i));
+    };
+    pc.querySelector(".gprev").addEventListener("click", () => go(-1));
+    pc.querySelector(".gnext").addEventListener("click", () => go(1));
   }
 
   window.scrollTo(0, 0);
