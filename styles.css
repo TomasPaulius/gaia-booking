@@ -171,14 +171,19 @@ section { padding: 84px 0; }
 .card:hover .card-media img { transform: scale(1.04); }
 
 /* image gallery arrows + dots (search cards + property mobile carousel) */
-.gnav { position: absolute; top: 50%; transform: translateY(-50%); width: 33px; height: 33px; border-radius: 50%; background: rgba(255,255,255,.92); color: var(--ink); display: grid; place-items: center; font-size: 21px; line-height: 0; padding-bottom: 3px; box-shadow: var(--shadow-sm); cursor: pointer; opacity: .92; transition: opacity .2s, background .2s, transform .15s; z-index: 4; }
-.gprev { left: 10px; }
-.gnext { right: 10px; }
+.gnav { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.95); color: var(--ink); display: grid; place-items: center; font-size: 21px; line-height: 0; padding-bottom: 3px; box-shadow: var(--shadow-sm); cursor: pointer; opacity: 0; transition: opacity .25s ease, background .2s, transform .15s; z-index: 4; }
+.gprev { left: 12px; }
+.gnext { right: 12px; }
 .gnav:hover { background: #fff; transform: translateY(-50%) scale(1.08); }
 .gnav:active { transform: translateY(-50%) scale(.94); }
+/* arrows only inside the desktop preview panel, and only on hover */
+.preview-panel:hover .gnav { opacity: 1; }
 .gdots { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; z-index: 4; pointer-events: none; }
-.gdots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: background .2s, transform .2s; }
+.gdots span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.55); box-shadow: 0 1px 2px rgba(0,0,0,.28); transition: background .2s, transform .2s; }
 .gdots span.on { background: #fff; transform: scale(1.25); }
+/* small result cards: no dots clutter on desktop (the hover preview handles browsing) */
+.card-media .gdots { display: none; }
+.gcount { position: absolute; top: 12px; right: 12px; z-index: 4; background: rgba(20,18,16,.6); color: #fff; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; }
 .pd-carousel { display: none; }
 .card-fav { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.85); display: grid; place-items: center; font-size: 16px; color: var(--ink); }
 .card-tag { position: absolute; top: 14px; left: 14px; background: rgba(255,255,255,0.92); color: var(--ink); font-size: 12px; font-weight: 600; padding: 6px 11px; border-radius: 999px; }
@@ -373,12 +378,13 @@ section { padding: 84px 0; }
   .results-top { position: static; top: auto; }
   .results-top-inner { padding: 12px 20px; gap: 12px; }
   .results-summary b { font-size: 17px; }
-  .gnav { opacity: 1; width: 36px; height: 36px; }
+  /* result cards: show dots, swipe to browse photos (no arrows on mobile) */
+  .card-media .gdots { display: flex; }
 
-  /* property detail: desktop grid hidden, one big photo + arrows */
+  /* property detail: desktop grid hidden, one big swipeable photo + dots + counter */
   .pd-gallery { display: none; }
   .pd-carousel { display: block; position: relative; aspect-ratio: 4/3; border-radius: var(--radius); overflow: hidden; background: var(--cream-2); }
-  .pd-carousel .pc-photo { width: 100%; height: 100%; object-fit: cover; }
+  .pd-carousel .g-photo { width: 100%; height: 100%; object-fit: cover; }
   .pd-head h1 { font-size: 28px; }
   .pd-body { gap: 0; }
 

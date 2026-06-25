@@ -47,7 +47,7 @@ function cardHTML(p, booked = false) {
     <article class="card ${booked ? "is-booked" : ""}" data-id="${p.id}">
       <div class="card-media">
         ${imgTag(p.images[0], p.name, "g-photo")}
-        ${p.images.length > 1 ? `<button class="gnav gprev" type="button" aria-label="Previous photo">‹</button><button class="gnav gnext" type="button" aria-label="Next photo">›</button><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
+        ${p.images.length > 1 ? `<div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
         <span class="card-tag">${p.neighborhood}</span>
         <span class="card-fav">♡</span>
       </div>
@@ -67,25 +67,42 @@ function cardHTML(p, booked = false) {
     </article>`;
 }
 
-// Wire the ‹ › arrows + dots on every card image so photos flip on click (works on
-// desktop and mobile). Arrow clicks don't bubble, so they never open the residence.
+// Reusable image gallery: swaps a single .g-photo. Wires optional ‹/› arrows,
+// dots, and finger swipe. Arrow clicks don't bubble (so a card isn't opened).
+function initGallery(root, images) {
+  const photo = root.querySelector(".g-photo");
+  if (!photo || !images || images.length < 2) return;
+  const dots = [...root.querySelectorAll(".gdots span")];
+  const count = root.querySelector(".gcount");
+  let i = 0;
+  const go = (d, e) => {
+    if (e) e.stopPropagation();
+    i = (i + d + images.length) % images.length;
+    photo.src = images[i];
+    dots.forEach((dt, j) => dt.classList.toggle("on", j === i));
+    if (count) count.textContent = (i + 1) + " / " + images.length;
+  };
+  root.querySelector(".gprev") && root.querySelector(".gprev").addEventListener("click", e => go(-1, e));
+  root.querySelector(".gnext") && root.querySelector(".gnext").addEventListener("click", e => go(1, e));
+  // finger swipe (mobile)
+  let x0 = null, y0 = null;
+  photo.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  photo.addEventListener("touchend", e => {
+    if (x0 == null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1);
+    x0 = null;
+  }, { passive: true });
+}
+
+// Cards: dots + swipe (no arrows). Hover shows the side preview where arrows live.
 function wireCardGalleries(scope) {
   (scope || document).querySelectorAll(".card[data-id]").forEach(card => {
     if (card.dataset.gwired) return;
     const p = PROPERTIES.find(x => x.id === card.dataset.id);
-    if (!p || p.images.length < 2) return;
+    if (!p) return;
     card.dataset.gwired = "1";
-    const photo = card.querySelector(".g-photo");
-    const dots = [...card.querySelectorAll(".gdots span")];
-    let i = 0;
-    const go = (d, e) => {
-      e.stopPropagation();
-      i = (i + d + p.images.length) % p.images.length;
-      photo.src = p.images[i];
-      dots.forEach((dt, j) => dt.classList.toggle("on", j === i));
-    };
-    card.querySelector(".gprev").addEventListener("click", e => go(-1, e));
-    card.querySelector(".gnext").addEventListener("click", e => go(1, e));
+    initGallery(card, p.images);
   });
 }
 
@@ -346,11 +363,9 @@ function renderPreview(p) {
   const total = subtotal + p.cleaning;
   panel.innerHTML = `
     <div class="pp-media">
-      <img id="pp-main" loading="lazy" src="${p.images[0]}" alt="${p.name}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/gaia/900/700'" />
+      ${imgTag(p.images[0], p.name, "g-photo")}
+      ${p.images.length > 1 ? `<button class="gnav gprev" type="button" aria-label="Previous photo">‹</button><button class="gnav gnext" type="button" aria-label="Next photo">›</button><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
       <span class="pp-tag">${p.neighborhood}</span>
-    </div>
-    <div class="pp-thumbs">
-      ${p.images.map((im, i) => `<button class="pp-thumb${i === 0 ? " active" : ""}" data-src="${im}" aria-label="Photo ${i + 1}"><img src="${im}" alt="" loading="lazy" /></button>`).join("")}
     </div>
     <div class="pp-body">
       <div class="pp-row"><h3>${p.name}</h3><span class="pp-rate">${stars(p.rating)}</span></div>
@@ -370,11 +385,7 @@ function renderPreview(p) {
   `;
   const rb = document.getElementById("pp-reserve");
   if (rb) rb.addEventListener("click", () => (location.hash = `#/book/${p.id}`));
-  // quick photo review: hover or click a thumbnail to swap the main image
-  const main = panel.querySelector("#pp-main");
-  const thumbs = panel.querySelectorAll(".pp-thumb");
-  const swap = (t) => { if (main) main.src = t.dataset.src; thumbs.forEach(x => x.classList.toggle("active", x === t)); };
-  thumbs.forEach(t => { t.addEventListener("mouseenter", () => swap(t)); t.addEventListener("click", () => swap(t)); });
+  initGallery(panel, p.images);
 }
 
 // One shared development map for the Location page (all residences sit on the same hilltop).
@@ -433,8 +444,8 @@ function renderProperty(id) {
         ${p.images.slice(1, 5).map(i => imgTag(i, p.name, "")).join("")}
       </div>
       <div class="pd-carousel" id="pd-carousel">
-        ${imgTag(p.images[0], p.name, "pc-photo")}
-        ${p.images.length > 1 ? `<button class="gnav gprev" type="button" aria-label="Previous photo">‹</button><button class="gnav gnext" type="button" aria-label="Next photo">›</button><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
+        ${imgTag(p.images[0], p.name, "g-photo")}
+        ${p.images.length > 1 ? `<div class="gcount" id="pd-count">1 / ${p.images.length}</div><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
       </div>
 
       <div class="pd-body">
@@ -540,20 +551,8 @@ function renderProperty(id) {
     if (!document.getElementById("reserve-btn").disabled) location.hash = `#/book/${p.id}`;
   });
 
-  // mobile photo carousel: arrows + dots
-  const pc = document.getElementById("pd-carousel");
-  if (pc && p.images.length > 1) {
-    const photo = pc.querySelector(".pc-photo");
-    const dots = [...pc.querySelectorAll(".gdots span")];
-    let i = 0;
-    const go = (d) => {
-      i = (i + d + p.images.length) % p.images.length;
-      photo.src = p.images[i];
-      dots.forEach((dt, j) => dt.classList.toggle("on", j === i));
-    };
-    pc.querySelector(".gprev").addEventListener("click", () => go(-1));
-    pc.querySelector(".gnext").addEventListener("click", () => go(1));
-  }
+  // mobile photo gallery: swipe + dots + counter
+  initGallery(document.getElementById("pd-carousel"), p.images);
 
   window.scrollTo(0, 0);
 }
