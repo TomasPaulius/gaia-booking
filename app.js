@@ -22,6 +22,9 @@ function imgTag(src, alt, cls = "") {
     onerror="this.onerror=null;this.src='${fb}'" />`;
 }
 
+// Shared resident amenities (sauna + yoga shala), shown at the end of every listing's photos.
+const AMENITY_PHOTOS = ["img/sauna-ext.jpg", "img/sauna-int.jpg", "img/yoga-ext.jpg", "img/yoga-int.jpg"];
+
 function nights(ci, co) {
   const a = new Date(ci), b = new Date(co);
   return Math.max(0, Math.round((b - a) / 86400000));
@@ -143,7 +146,7 @@ function wireCardGalleries(scope) {
    ============================================================ */
 function renderHome() {
   const featured = PROPERTIES.slice(0, 6);
-  const gallery = ["img/demo-sofa.jpg", "img/cafe-2.jpg", "img/demo-bed.jpg", "img/demo-plants.jpg", "img/ext-2.jpg", "img/duplex-living.jpg"];
+  const gallery = ["img/demo-sofa.jpg", "img/cafe-2.jpg", "img/demo-bed.jpg", "img/sauna-ext.jpg", "img/yoga-ext.jpg", "img/duplex-living.jpg"];
   const tens = [
     ["Sofia M.", "Stayed 5 nights", "The view at sunset is unreal, and the residence was spotless. Booking direct saved us a real chunk versus the app."],
     ["James & Ava", "Stayed 7 nights", "Two minutes to the beach, then café and yoga on-site. The team handled everything. Faultless."],
@@ -456,6 +459,7 @@ function renderProperty(id) {
 
   const n = nights(store.checkin, store.checkout) || 3;
   const avail = isAvailable(p, store.checkin, store.checkout);
+  const gall = [...p.images, ...AMENITY_PHOTOS];
 
   app.innerHTML = `
     <div class="wrap pd">
@@ -475,9 +479,13 @@ function renderProperty(id) {
         ${imgTag(p.images[0], p.name, "g-main")}
         ${p.images.slice(1, 5).map(i => imgTag(i, p.name, "")).join("")}
       </div>
+      <div class="pd-extra">
+        <div class="pd-extra-h">Residents' spa, sauna & yoga shala</div>
+        <div class="pd-more">${AMENITY_PHOTOS.map(im => imgTag(im, "Gaia spa, sauna and yoga")).join("")}</div>
+      </div>
       <div class="pd-carousel" id="pd-carousel">
-        <div class="gtrack">${p.images.map(im => imgTag(im, p.name)).join("")}</div>
-        ${p.images.length > 1 ? `<div class="gcount">1 / ${p.images.length}</div><div class="gdots">${p.images.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
+        <div class="gtrack">${gall.map(im => imgTag(im, p.name)).join("")}</div>
+        ${gall.length > 1 ? `<div class="gcount">1 / ${gall.length}</div><div class="gdots">${gall.map((_, i) => `<span class="${i === 0 ? "on" : ""}"></span>`).join("")}</div>` : ""}
       </div>
 
       <div class="pd-body">
@@ -768,8 +776,8 @@ function renderLocation() {
 function renderAmenities() {
   const rows = [
     { t: "On-Site Café & Restaurant", img: "img/cafe-1.jpg", d: "A boho-chic three-tier café with sea views, a pool terrace and an air-conditioned co-working space. Morning coffee by the water, sunset dinner in the open air." },
-    { t: "High-End Spa & Sauna", img: "img/demo-plants.jpg", d: "A full spa open to residents, with sauna and ice bath on-site. Wellness is part of everyday life at Gaia, not a once-a-trip treat." },
-    { t: "Yoga Shala", img: "img/cafe-3.jpg", d: "A dedicated movement space nestled within the grounds. Koh Phangan is one of the world's premier wellness destinations, brought home to your doorstep." },
+    { t: "High-End Spa & Sauna", img: "img/sauna-ext.jpg", d: "A full spa open to residents, with a sauna over the bay, plunge pool and ice bath on-site. Wellness is part of everyday life at Gaia, not a once-a-trip treat." },
+    { t: "Yoga Shala", img: "img/yoga-ext.jpg", d: "A dedicated yoga shala nestled within the grounds, open to the jungle and the sea. Koh Phangan is one of the world's premier wellness destinations, brought home to your doorstep." },
     { t: "Gym, Pool & Beyond", img: "img/ext-2.jpg", d: "A fully-equipped gym, pools across the development and a family day-care centre. A complete daily rhythm without leaving the hilltop." },
   ];
   app.innerHTML = pageBanner("Life at Gaia", "Everything in one place",

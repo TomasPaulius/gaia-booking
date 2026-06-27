@@ -248,6 +248,12 @@ section { padding: 84px 0; }
 .pd-gallery img:hover { filter: brightness(0.92); }
 .pd-gallery .g-main { grid-row: span 2; }
 .pd-dots { display: none; }
+/* shared spa/sauna/yoga strip under the main gallery (desktop; mobile gets them in the carousel) */
+.pd-extra { margin-top: 10px; }
+.pd-extra-h { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin: 22px 0 12px; }
+.pd-more { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.pd-more img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: var(--radius-sm); transition: filter .2s; }
+.pd-more img:hover { filter: brightness(.93); }
 .pd-body { display: grid; grid-template-columns: 1.6fr 1fr; gap: 56px; margin-top: 46px; }
 .pd-section { padding-bottom: 34px; margin-bottom: 34px; border-bottom: 1px solid var(--line); }
 .pd-section h2 { font-size: 26px; margin-bottom: 14px; }
@@ -390,7 +396,7 @@ section { padding: 84px 0; }
   .gtrack { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
 
   /* property detail: desktop grid hidden, one big swipeable photo + dots + counter */
-  .pd-gallery { display: none; }
+  .pd-gallery, .pd-extra { display: none; }
   .pd-carousel { display: block; position: relative; aspect-ratio: 4/3; border-radius: var(--radius); overflow: hidden; background: var(--cream-2); }
   .pd-head h1 { font-size: 28px; }
   .pd-body { gap: 0; }
